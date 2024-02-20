@@ -1,0 +1,20 @@
+stages:
+  - build
+
+build:
+  stage: build
+  image: docker
+  only:
+    - tags
+  services:
+    - docker:dind
+  variables:
+    DOCKER_HOST: tcp://docker:2375/
+    DOCKER_DRIVER: overlay2
+  before_script:
+    - docker version
+  script:
+    - docker build -f Dockerfile -t $CI_REGISTRY/dewadg/bevel:latest .
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
+    - docker push $CI_REGISTRY/dewadg/bevel:latest
+ 
